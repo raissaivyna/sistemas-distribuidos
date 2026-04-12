@@ -3,18 +3,31 @@
 
 #include "Produto.hpp"
 
-class ProdutoVeterinario : public Produto
+class ProdutoVeterinario 
+: public Produto
 {
-protected:
-    int tipo;
+private:
+    string registroMapa;
+    string especieAlvo;
+    string viaAdministracao;
 
 public:
     ProdutoVeterinario();
 
     // n = nome, p = preco, t = tipo
-    ProdutoVeterinario(string n, float p, int t);
+    ProdutoVeterinario(int id, const string& nome, double preco, const string& fabricante,
+        const string& regM, const string& espA, const string& vAdm);
 
-    int getTipo();
+    string getRegistroMapa() const;
+
+    void setRegistroMapa(const string& regM);
+
+    string getEspecieAlvo() const;
+    void setEspecieAlvo(const string& espA);
+
+    string getViaAdministracao() const;
+    void setViaAdministracao(const string& vAdm);
+    string toString()const;
 };
 
 

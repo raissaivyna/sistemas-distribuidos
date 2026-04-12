@@ -2,19 +2,33 @@
 #define PRODUTO_HPP
 
 #include <string>
+#include <vector>
+#include <iostream>
 using namespace std;
+
 
 class Produto
 {
-protected:
+private:
+    int id;
     string nome;
-    float preco;
+    double preco;
+    string fabricante;
+
 public:
     Produto();
-    Produto(string n, float p);  // n - nome, p - preco
+    Produto(int i,const string& n, const double& p, const string& f);  // i - id, n - nome, p - preco, f - fabricante
+    virtual ~Produto() {};
 
-    string getNome();
-    float getPreco();
+    int getId() const;
+    void setId(int i);
+    string getNome() const;
+    void setNome(const string& n);
+    double getPreco() const;
+    void setPreco(double p);
+    string getFabricante() const;
+    void setFabricante(const string& f);
+    string toString() const;
 };
 
 
