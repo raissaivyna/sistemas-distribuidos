@@ -1,5 +1,3 @@
-// g++ src/*.cpp modelo/*.cpp stream/*.cpp test/main.cpp -Iinclude -o cliente.exe
-
 #include "VacinaPerecivelOutputStream.hpp"
 #include <fstream>
 
