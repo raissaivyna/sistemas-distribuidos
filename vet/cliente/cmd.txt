@@ -1,0 +1,9 @@
+testar inputStream
+g++ test/testeInputStreamB.cpp stream/*.cpp modelo/*.cpp src/*.cpp -I include -o testeB.exe
+
+servidor
+g++ test/testeInputStreamD/servidor.cpp stream/*.cpp modelo/*.cpp src/*.cpp -I include -o servidor.exe -lws2_32
+
+
+cliente
+g++ test/testeInputStreamD/cliente.cpp stream/*.cpp modelo/*.cpp src/*.cpp -I include -o cliente.exe -lws2_32
