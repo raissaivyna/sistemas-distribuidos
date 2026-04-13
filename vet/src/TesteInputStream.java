@@ -1,13 +1,13 @@
 import pojo.VacinaPerecivel;
-import stream.VacinaPerecívelInputStream;
-import stream.VacinaPereceívelOutputStream;
+import stream.VacinaPerecivelInputStream;
+import stream.VacinaPerecivelOutputStream;
 
 import java.io.*;
 import java.net.*;
 import java.util.List;
 
 /**
- * TesteInputStream — testa as 3 origens do VacinaPerecívelInputStream:
+ * TesteInputStream — testa as 3 origens do VacinaPerecivelInputStream:
  *
  *   b) System.in       → java -cp out TesteInputStream stdin
  *   c) FileInputStream → java -cp out TesteInputStream arquivo
@@ -63,7 +63,7 @@ public class TesteInputStream {
         System.err.println("╚══════════════════════════════════════════╝");
         System.err.println("Lendo bytes do stdin...\n");
 
-        try (VacinaPerecívelInputStream vis = new VacinaPerecívelInputStream(System.in)) {
+        try (VacinaPerecivelInputStream vis = new VacinaPerecivelInputStream(System.in)) {
             List<VacinaPerecivel> lidas = vis.lerVacinas();
             imprimirResultado(lidas);
         }
@@ -84,8 +84,8 @@ public class TesteInputStream {
         if (!arquivo.exists()) {
             System.out.println("Arquivo não encontrado. Gerando vacinas.bin primeiro...");
             try (FileOutputStream fos = new FileOutputStream(caminho)) {
-                VacinaPereceívelOutputStream vos =
-                    new VacinaPereceívelOutputStream(vacinas, vacinas.length, fos);
+                VacinaPerecivelOutputStream vos =
+                    new VacinaPerecivelOutputStream(vacinas, vacinas.length, fos);
                 vos.enviar();
             }
             System.out.println("Arquivo gerado: " + arquivo.getAbsolutePath());
@@ -95,7 +95,7 @@ public class TesteInputStream {
                            " (" + arquivo.length() + " bytes)\n");
 
         try (FileInputStream fis = new FileInputStream(arquivo);
-             VacinaPerecívelInputStream vis = new VacinaPerecívelInputStream(fis)) {
+             VacinaPerecivelInputStream vis = new VacinaPerecivelInputStream(fis)) {
 
             List<VacinaPerecivel> lidas = vis.lerVacinas();
             imprimirResultado(lidas);
@@ -121,8 +121,8 @@ public class TesteInputStream {
                 Socket conn = ssHolder[0].accept();
                 System.out.println("[Mini-servidor] Cliente conectado.\n");
 
-                try (VacinaPerecívelInputStream vis =
-                         new VacinaPerecívelInputStream(conn.getInputStream())) {
+                try (VacinaPerecivelInputStream vis =
+                         new VacinaPerecivelInputStream(conn.getInputStream())) {
                     List<VacinaPerecivel> recebidas = vis.lerVacinas();
                     System.out.println("\n=== Objetos reconstruídos no servidor ===");
                     imprimirResultado(recebidas);
@@ -141,8 +141,8 @@ public class TesteInputStream {
         // Cliente envia os dados
         try (Socket socket = new Socket("localhost", 7896)) {
             System.out.println("[Cliente TCP] Conectado. Enviando " + vacinas.length + " vacina(s)...");
-            VacinaPereceívelOutputStream vos =
-                new VacinaPereceívelOutputStream(vacinas, vacinas.length,
+            VacinaPerecivelOutputStream vos =
+                new VacinaPerecivelOutputStream(vacinas, vacinas.length,
                                                   socket.getOutputStream());
             vos.enviar();
             System.out.println("[Cliente TCP] Dados enviados!\n");

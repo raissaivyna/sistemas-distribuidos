@@ -1,11 +1,11 @@
 import pojo.VacinaPerecivel;
-import stream.VacinaPereceívelOutputStream;
+import stream.VacinaPerecivelOutputStream;
 
 import java.io.*;
 import java.net.*;
 
 /**
- * TesteOutputStream — testa os 3 destinos do VacinaPereceívelOutputStream:
+ * TesteOutputStream — testa os 3 destinos do VacinaPerecivelOutputStream:
  *   i.  System.out  (saída padrão)
  *   ii. FileOutputStream  (arquivo em disco)
  *   iii. Socket TCP  (servidor remoto — inicie ServidorTCP antes)
@@ -48,8 +48,8 @@ public class TesteOutputStream {
         System.out.println("╚══════════════════════════════════════════╝");
         System.out.println("[obs: bytes binários aparecem como caracteres estranhos — normal!]\n");
 
-        VacinaPereceívelOutputStream outStdout =
-            new VacinaPereceívelOutputStream(vacinas, quantidade, System.out);
+        VacinaPerecivelOutputStream outStdout =
+            new VacinaPerecivelOutputStream(vacinas, quantidade, System.out);
         outStdout.enviar();
 
         System.out.println("\n\n✅ TESTE i concluído.\n");
@@ -64,8 +64,8 @@ public class TesteOutputStream {
         String caminhoArquivo = "vacinas.bin";
 
         try (FileOutputStream fos = new FileOutputStream(caminhoArquivo)) {
-            VacinaPereceívelOutputStream outArquivo =
-                new VacinaPereceívelOutputStream(vacinas, quantidade, fos);
+            VacinaPerecivelOutputStream outArquivo =
+                new VacinaPerecivelOutputStream(vacinas, quantidade, fos);
             outArquivo.enviar();
         }
 
@@ -84,8 +84,8 @@ public class TesteOutputStream {
         try (Socket socket = new Socket("localhost", 7896)) {
             OutputStream socketOut = socket.getOutputStream();
 
-            VacinaPereceívelOutputStream outTCP =
-                new VacinaPereceívelOutputStream(vacinas, quantidade, socketOut);
+            VacinaPerecivelOutputStream outTCP =
+                new VacinaPerecivelOutputStream(vacinas, quantidade, socketOut);
             outTCP.enviar();
 
             System.out.println(" Dados enviados ao servidor TCP com sucesso!");

@@ -1,14 +1,20 @@
 #!/bin/bash
-# compile_run.sh — Compila e executa o projeto
-# Uso:
-#   bash compile_run.sh            → compila + roda Main (POJOs)
-#   bash compile_run.sh stream     → compila + roda TesteOutputStream
-#   bash compile_run.sh servidor   → compila + inicia ServidorTCP
+# compile_run.sh — Clinica Veterinaria — Sistema Distribuido Completo
+#
+# Modos:
+#   bash compile_run.sh                    → Main (POJOs)
+#   bash compile_run.sh stream             → TesteOutputStream
+#   bash compile_run.sh inputstream        → TesteInputStream
+#   bash compile_run.sh servidorcompleto   → ServidorClinicaCompleto (porta 7896)
+#   bash compile_run.sh clientecompleto    → ClienteClinicaCompleto  (TCP + multicast)
+#   bash compile_run.sh receptor           → ReceptorAlertas standalone (UDP)
+#   bash compile_run.sh serializacao       → TesteSerializacao (Fase 5)
+#   bash compile_run.sh servidorclinica    → ServidorClinica simples
 
 SRC="src"
 OUT="out"
 
-echo "🔨 Compilando todo o projeto..."
+echo "Compilando..."
 mkdir -p $OUT
 
 javac -encoding UTF-8 -d $OUT \
@@ -22,51 +28,39 @@ javac -encoding UTF-8 -d $OUT \
   $SRC/pojo/Estoque.java \
   $SRC/modelo/ProdutoServico.java \
   $SRC/modelo/EstoqueServico.java \
-  $SRC/stream/VacinaPereceívelOutputStream.java \
-  $SRC/stream/VacinaPerecívelInputStream.java \
+  "$SRC/stream/VacinaPerecivelOutputStream.java" \
+  $SRC/stream/VacinaPerecivelInputStream.java \
+  $SRC/protocolo/Protocolo.java \
+  $SRC/protocolo/SerializadorJSON.java \
+  $SRC/multicast/AlertaClinica.java \
+  $SRC/multicast/ReceptorAlertas.java \
+  $SRC/multicast/JanelaOperacao.java \
   $SRC/servidor/ServidorTCP.java \
   $SRC/servidor/ServidorTCPInputStream.java \
+  $SRC/servidor/ServidorClinica.java \
+  $SRC/servidor/ServidorClinicaCompleto.java \
+  $SRC/cliente/ClienteClinica.java \
+  $SRC/cliente/ClienteClinicaCompleto.java \
   $SRC/Main.java \
   $SRC/TesteOutputStream.java \
-  $SRC/TesteInputStream.java
+  $SRC/TesteInputStream.java \
+  $SRC/TesteSerializacao.java
 
-if [ $? -ne 0 ]; then
-  echo "❌ Erro de compilação."
-  exit 1
-fi
-
-echo "✅ Compilado com sucesso!"
+if [ $? -ne 0 ]; then echo "Erro de compilacao."; exit 1; fi
+echo "Compilado com sucesso!"
 echo ""
 
 case "$1" in
-  stream)
-    echo "▶️  Rodando TesteOutputStream (3 destinos)..."
-    echo "----------------------------------------"
-    java -cp $OUT TesteOutputStream
-    ;;
-  inputstream)
-    echo "▶️  Rodando TesteInputStream (arquivo + TCP)..."
-    echo "----------------------------------------"
-    java -cp $OUT TesteInputStream
-    ;;
-  stdin)
-    echo "▶️  Modo pipe — gera bytes e lê via stdin..."
-    echo "----------------------------------------"
-    java -cp $OUT TesteOutputStream 2>/dev/null | java -cp $OUT TesteInputStream stdin
-    ;;
-  servidor)
-    echo "▶️  Iniciando ServidorTCP (raw) na porta 7896..."
-    echo "----------------------------------------"
-    java -cp $OUT servidor.ServidorTCP
-    ;;
-  servidor2)
-    echo "▶️  Iniciando ServidorTCPInputStream na porta 7896..."
-    echo "----------------------------------------"
-    java -cp $OUT servidor.ServidorTCPInputStream
-    ;;
-  *)
-    echo "▶️  Rodando Main (teste de POJOs e serviços)..."
-    echo "----------------------------------------"
-    java -cp $OUT Main
-    ;;
+  stream)           java -cp $OUT TesteOutputStream ;;
+  inputstream)      java -cp $OUT TesteInputStream ;;
+  servidorcompleto) echo "ServidorClinicaCompleto — porta 7896"
+                    java -cp $OUT servidor.ServidorClinicaCompleto ;;
+  clientecompleto)  echo "ClienteClinicaCompleto — TCP + UDP multicast"
+                    java -cp $OUT cliente.ClienteClinicaCompleto ;;
+  receptor)         echo "ReceptorAlertas standalone — UDP multicast"
+                    java -cp $OUT multicast.ReceptorAlertas ;;
+  serializacao)     java -cp $OUT TesteSerializacao ;;
+  servidorclinica)  java -cp $OUT servidor.ServidorClinica ;;
+  clienteclinica)   java -cp $OUT cliente.ClienteClinica ;;
+  *)                java -cp $OUT Main ;;
 esac

@@ -3,8 +3,10 @@ package pojo;
 /**
  * POJO 1 — Superclasse Produto
  * Base de toda a hierarquia de produtos veterinários.
+ * Essa classe representa qualquer produto veterinário, com informações básicas comuns.
  */
 public class Produto {
+// ____ Caracteristicas do produto
 
     private int    id;
     private String nome;

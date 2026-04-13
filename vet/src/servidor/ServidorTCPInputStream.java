@@ -1,6 +1,6 @@
 package servidor;
 
-import stream.VacinaPerecívelInputStream;
+import stream.VacinaPerecivelInputStream;
 import pojo.VacinaPerecivel;
 
 import java.io.*;
@@ -8,7 +8,7 @@ import java.net.*;
 import java.util.List;
 
 /**
- * ServidorTCPInputStream — versão do servidor que usa VacinaPerecívelInputStream
+ * ServidorTCPInputStream — versão do servidor que usa VacinaPerecivelInputStream
  * para reconstruir objetos diretamente do socket TCP.
  *
  * Terminal 1:  java -cp out servidor.ServidorTCPInputStream
@@ -38,8 +38,8 @@ public class ServidorTCPInputStream {
     }
 
     private static void tratarCliente(Socket socket) {
-        try (VacinaPerecívelInputStream vis =
-                 new VacinaPerecívelInputStream(socket.getInputStream())) {
+        try (VacinaPerecivelInputStream vis =
+                 new VacinaPerecivelInputStream(socket.getInputStream())) {
 
             List<VacinaPerecivel> vacinas = vis.lerVacinas();
 

@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 
 /**
- * ServidorTCP — recebe bytes enviados pelo VacinaPereceívelOutputStream via TCP.
+ * ServidorTCP — recebe bytes enviados pelo VacinaPerecivelOutputStream via TCP.
  *
  * Execução: java -cp out servidor.ServidorTCP
  * (inicie ANTES do teste TCP no TesteOutputStream)

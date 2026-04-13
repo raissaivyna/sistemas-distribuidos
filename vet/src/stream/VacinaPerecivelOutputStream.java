@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * VacinaPerecívelOutputStream — subclasse de OutputStream
+ * VacinaPerecivelOutputStream — subclasse de OutputStream
  *
  * Serializa um array de VacinaPerecivel para qualquer OutputStream de destino.
  *
@@ -20,7 +20,7 @@ import java.io.OutputStream;
  * │  [8 bytes] temperaturaMaxima (double)               │
  * └─────────────────────────────────────────────────────┘
  */
-public class VacinaPereceívelOutputStream extends OutputStream {
+public class VacinaPerecivelOutputStream extends OutputStream {
 
     private final VacinaPerecivel[] vacinas;   // (i)  array de objetos
     private final int               quantidade; // (ii) número de objetos a enviar
@@ -31,7 +31,7 @@ public class VacinaPereceívelOutputStream extends OutputStream {
      * @param quantidade (ii) quantos objetos do array serão enviados
      * @param destino    (iv) OutputStream de destino
      */
-    public VacinaPereceívelOutputStream(VacinaPerecivel[] vacinas,
+    public VacinaPerecivelOutputStream(VacinaPerecivel[] vacinas,
                                          int quantidade,
                                          OutputStream destino) {
         this.vacinas    = vacinas;
