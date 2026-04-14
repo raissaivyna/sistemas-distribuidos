@@ -39,7 +39,7 @@ void VacinaPerecivelOutputStream::writeInt(int valor) {
 }
 
 void VacinaPerecivelOutputStream::writeDouble(double valor) {
-    long long bits;
+    uint64_t bits;
     memcpy(&bits, &valor, sizeof(double));
 
     for (int i = 56; i >= 0; i -= 8) {
