@@ -174,7 +174,7 @@ inet_pton(AF_INET, "10.10.239.205", &server.sin_addr);
 
 ## 💡 Conclusão
 
-O projeto permitiu compreender na prática conceitos fundamentais de sistemas distribuídos, como:
+### ENTREGA 1:
 
 * Comunicação via sockets
 * Serialização de dados
