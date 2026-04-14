@@ -26,6 +26,8 @@ g++ test/testeInputStreamD/cliente.cpp stream/*.cpp modelo/*.cpp src/*.cpp -I in
 RODAR /cliente/clienteTCP.cpp  no linux:
 g++ cliente/clienteTCP.cpp modelo/*.cpp stream/*.cpp src/*.cpp protocolo/*.cpp -Iinclude -o cliente_tcp
 
+g++ cliente/clienteClinicaCompleto.cpp modelo/*.cpp stream/*.cpp src/*.cpp protocolo/*.cpp -Iinclude -o clienteClinicaCompleto
+
 
 
 // compilar tudo
