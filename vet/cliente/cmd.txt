@@ -23,3 +23,10 @@ g++ test/testeInputStreamD/servidor.cpp stream/*.cpp modelo/*.cpp src/*.cpp -I i
 cliente
 g++ test/testeInputStreamD/cliente.cpp stream/*.cpp modelo/*.cpp src/*.cpp -I include -o test/cliente.exe -lws2_32
 
+RODAR /cliente/clienteTCP.cpp  no linux:
+g++ cliente/clienteTCP.cpp modelo/*.cpp stream/*.cpp src/*.cpp protocolo/*.cpp -Iinclude -o cliente_tcp
+
+
+
+// compilar tudo
+g++ $(find . -name "*.cpp") -Iinclude -o cliente_tcp

@@ -2,7 +2,7 @@
 #include <vector>
 #include <cstring>
 #include <sstream>
-#include "VacinaPerecivelOutputStream.hpp"
+#include "Protocolo.hpp"
 // g++ cliente/clienteTCP.cpp modelo/*.cpp stream/*.cpp -Iinclude -o cliente_tcp.exe -lws2_32
 
 #ifdef _WIN32
@@ -24,6 +24,7 @@ int main() {
     #endif
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
+
     sockaddr_in serverAddr;
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(7896);
@@ -36,28 +37,14 @@ int main() {
     }
     cout << "[CLIENTE] Conectado ao servidor" << endl;
 
-    // criar objeto
-    VacinaPerecivel vacinas[1] = {
-        VacinaPerecivel(1, "Vacina A", 10.5, "Pfizer", "123", "humano", "oral",
-        "virus", "A", 2, "10/10/2026", "geladeira", 2.0, 8.0)
-    };
+    Protocolo::enviarMensagem(sock, 1, "");
 
-    // serializa
-    ostringstream buffer(ios::binary);
-
-    VacinaPerecivelOutputStream stream(vacinas, 1, buffer);
-    stream.enviar();
-
-    // pegar bytes
-    string dados = buffer.str();
-
-    // envia
-    send(sock, dados.data(), dados.size(), 0);
-
-    cout << "[CLIENTE] Dados enviados com sucesso!" << endl;
+    int op;
+    string resposta = Protocolo::receberResposta(sock, op);
+    cout << "Resposta do servidor (op " << op << "): " << resposta << endl;
 
     // fecha
-
+shutdown(sock, SHUT_WR);
 #ifdef _WIN32
     closesocket(sock);
     WSACleanup();
