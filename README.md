@@ -2,6 +2,13 @@
 
 Projeto desenvolvido para a disciplina de Sistemas Distribuídos, com foco em comunicação cliente-servidor, serialização de dados e uso de múltiplos protocolos (TCP e UDP multicast).
 
+Apresentação do projeto:
+https://youtu.be/GZ2-29UqJ4U
+
+---
+## Desenvolvedoras
+- Raissa Ívyna
+- Francisca Ariane
 ---
 
 ## 📌 Objetivo
