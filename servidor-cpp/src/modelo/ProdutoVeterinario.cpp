@@ -1,4 +1,4 @@
-#include "../include/entidades/ProdutoVeterinario.hpp"
+#include "../include/modelo/ProdutoVeterinario.hpp"
 
 ProdutoVeterinario::ProdutoVeterinario(){};
 

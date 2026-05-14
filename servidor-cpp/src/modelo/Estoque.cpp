@@ -1,4 +1,4 @@
-#include "../include/entidades/Estoque.hpp"
+#include "../include/modelo/Estoque.hpp"
 
 Estoque::Estoque(){}
 

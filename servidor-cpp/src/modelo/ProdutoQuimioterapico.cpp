@@ -1,4 +1,4 @@
-#include "../include/entidades/ProdutoQuimioterapico.hpp"
+#include "../include/modelo/ProdutoQuimioterapico.hpp"
 
 ProdutoQuimioterapico::ProdutoQuimioterapico(){};
 ProdutoQuimioterapico::ProdutoQuimioterapico(int id, const string& nome, double preco, const string& fabricante, 

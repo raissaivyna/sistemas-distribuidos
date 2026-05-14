@@ -1,4 +1,4 @@
-#include "../include/entidades/Produto.hpp"
+#include "../include/modelo/Produto.hpp"
 
 Produto::Produto(){};
 

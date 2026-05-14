@@ -1,4 +1,4 @@
-#include "../include/entidades/ProdutoBiologico.hpp"
+#include "../include/modelo/ProdutoBiologico.hpp"
 
 ProdutoBiologico::ProdutoBiologico(){};
 ProdutoBiologico::ProdutoBiologico(int id, const string& nome, double preco, const string& fabricante,

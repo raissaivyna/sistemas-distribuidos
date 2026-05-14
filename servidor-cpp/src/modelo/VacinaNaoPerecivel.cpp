@@ -1,4 +1,4 @@
-#include "../include/entidades/VacinaNaoPerecivel.hpp"
+#include "../include/modelo/VacinaNaoPerecivel.hpp"
 
 VacinaNaoPerecivel::VacinaNaoPerecivel(){}
 
