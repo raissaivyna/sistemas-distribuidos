@@ -21,6 +21,7 @@ public:
     void setLocal(const string& l);
     const vector<Produto*>& getProdutos() const;
     void setProdutos(const vector<Produto*>& p);
+    json toJson() const;
     string toString() const;
 };
 

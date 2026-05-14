@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 using namespace std;
 
 
@@ -19,6 +21,7 @@ public:
     Produto();
     Produto(int i,const string& n, const double& p, const string& f);  // i - id, n - nome, p - preco, f - fabricante
     virtual ~Produto() {};
+    virtual json toJson() const;
 
     int getId() const;
     void setId(int i);

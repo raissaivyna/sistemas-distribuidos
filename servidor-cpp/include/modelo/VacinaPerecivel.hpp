@@ -29,6 +29,7 @@ public:
     void setTemperaturaMaxima(double temperaturaMaxima);
     double getTemperaturaMinima() const;
     void setTemperaturaMinima(double temperaturaMinima);
+    json toJson() const;
     string toString() const;
 };
 

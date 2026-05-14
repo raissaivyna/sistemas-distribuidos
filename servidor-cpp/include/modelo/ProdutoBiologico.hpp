@@ -21,6 +21,7 @@ public:
     void setSorotipo(const string& sorotipo);
     int getNumDoses() const;
     void setNumDoses(int numDoses);
+    json toJson() const;
     string toString() const;
 };
 

@@ -27,6 +27,7 @@ public:
 
     string getViaAdministracao() const;
     void setViaAdministracao(const string& vAdm);
+    json toJson() const;
     string toString()const;
 };
 

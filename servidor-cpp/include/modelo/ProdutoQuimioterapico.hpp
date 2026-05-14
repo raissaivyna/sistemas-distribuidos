@@ -24,6 +24,7 @@ public:
     void setClasseTerapeutica(const string& classeTerapeutica);
     bool ehRetencaoCarencia() const;
     void setRetencaoCarencia(bool retencaoCarencia);
+    json toJson() const;
     string toString() const;
 };
 

@@ -21,6 +21,7 @@ class VacinaNaoPerecivel : public ProdutoBiologico
         void setprazoValidadeMeses(int p);
         double getTemperaturaMax() const;
         void setTemperaturaMax(double tempMax);
+        json toJson() const;
         string toString() const;
 };
 

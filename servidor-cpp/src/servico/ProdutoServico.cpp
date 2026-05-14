@@ -1,4 +1,4 @@
-#include "include/entidades/ProdutoServico.hpp"
+#include "ProdutoServico.hpp"
 
 ProdutoServico::ProdutoServico() {}
 
@@ -48,14 +48,16 @@ vector<VacinaPerecivel*> ProdutoServico::listarVacinasPereciveis() const {
     return vacinas;
 }
 
-json ProdutoServico::serializar(Produto* p) const {
-    json j;
-    j["id"] = p->getId();
-    j["nome"] = p->getNome();
-    j["preco"] = p->getPreco();
-    j["fabricante"] = p->getFabricante();
-    j["tipo"] = string(typeid(*p).name());
-    return j;
+string ProdutoServico::serializar(Produto* p) const {
+    string result = "";
+
+    result += "id=" + to_string(p->getId()) + ";";
+    result += "nome=" + p->getNome() + ";";
+    result += "preco=" + to_string(p->getPreco()) + ";";
+    result += "fabricante=" + p->getFabricante() + ";";
+
+    result += "tipo=" + string(typeid(*p).name()) + ";";
+    return result;
 }
 
 int ProdutoServico::getTotalProdutos() const {

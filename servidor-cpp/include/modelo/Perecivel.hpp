@@ -1,6 +1,7 @@
 #ifndef PERECIVEL_HPP
 #define PERECIVEL_HPP
 #include <string>
+using namespace std;
 
 class Perecivel
 {
