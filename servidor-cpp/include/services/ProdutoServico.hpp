@@ -1,9 +1,9 @@
 #ifndef PRODUTOSERVICO_HPP
 #define PRODUTOSERVICO_HPP
 
-#include "Produto.hpp"
-#include "ProdutoVeterinario.hpp"
-#include "VacinaPerecivel.hpp"
+#include "include/modelo/Produto.hpp"
+#include "include/modelo/ProdutoVeterinario.hpp"
+#include "include/modelo/VacinaPerecivel.hpp"
 #include <typeinfo>
 
 class ProdutoServico
@@ -21,7 +21,7 @@ public:
     vector <VacinaPerecivel*> listarVacinasPereciveis() const;
     vector <ProdutoVeterinario*> buscarPorEspecie(const string& especie) const;
     double calcularValorTotal() const;
-    string serializar(Produto* p) const;
+    json serializar(Produto* p) const;
     int getTotalProdutos() const;
 };
 
