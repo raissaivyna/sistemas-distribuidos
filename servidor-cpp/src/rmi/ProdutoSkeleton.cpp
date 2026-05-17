@@ -8,6 +8,7 @@ Reply ProdutoSkeleton::invocacao(const Request& request){
     if (request.metodoId == "listarTodos")
     {
         auto lista = service.listarTodos();
+        cout << "invocacao listarTodos, total: " << lista.size() << endl;
 
         json array = json::array();
         for (auto& produto : lista)
@@ -19,12 +20,16 @@ Reply ProdutoSkeleton::invocacao(const Request& request){
     }
     else if (request.metodoId == "buscarPorId")
     {
+        cout << "invocacao buscarPorId com id: " << request.parametros["id"] << endl;
         int id = request.parametros["id"];
         Produto* produto = service.buscarPorId(id);
         if (produto)
         {
             reply.status = "OK";
+            cout << "antes do json p/ debug" << endl;
+            cout << "tipo do produto: " << typeid(*produto).name() << endl;
             reply.resultado = produto->toJson();
+            cout << "depois do json p/ debug" << endl;
         }
         else
         {

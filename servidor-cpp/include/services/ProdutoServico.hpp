@@ -1,9 +1,9 @@
 #ifndef PRODUTOSERVICO_HPP
 #define PRODUTOSERVICO_HPP
 
-#include "include/modelo/Produto.hpp"
-#include "include/modelo/ProdutoVeterinario.hpp"
-#include "include/modelo/VacinaPerecivel.hpp"
+#include "../modelo/Produto.hpp"
+#include "../modelo/ProdutoVeterinario.hpp"
+#include "../modelo/VacinaPerecivel.hpp"
 #include <typeinfo>
 
 class ProdutoServico

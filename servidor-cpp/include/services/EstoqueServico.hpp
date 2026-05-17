@@ -1,8 +1,8 @@
 #ifndef ESTOQUESERVICO_HPP
 #define ESTOQUESERVICO_HPP
-#include "include/modelo/Estoque.hpp"
-#include "include/modelo/Perecivel.hpp"
-#include "include/modelo/Produto.hpp"
+#include "../modelo/Estoque.hpp"
+#include "../modelo/Perecivel.hpp"
+#include "../modelo/Produto.hpp"
 
 class EstoqueServico
 {
