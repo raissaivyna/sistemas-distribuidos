@@ -4,6 +4,9 @@
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
+
+#include "../protocolo/RemoteObjectRef.hpp"
+
 using namespace std;
 
 using json = nlohmann::json;
@@ -15,7 +18,8 @@ public:
     string TipoMensagem;
     int requestId;
 
-    string referenciaObj;
+    // passagem por referencia: referenciaObj identifica o objeto remoto a ser invocado, metodoId identifica o método a ser chamado e parametros contém os parâmetros necessários para a invocação
+    RemoteObjectRef referenciaObj; 
     string metodoId;
 
     json parametros;
