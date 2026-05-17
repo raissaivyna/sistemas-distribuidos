@@ -3,7 +3,7 @@
 ProdutoServico::ProdutoServico() {
     Produto* p1 = new Produto(0, "Ração para Cães", 150.0, "PetFood Co.");
     Produto* p2 = new Produto(0, "Ração para Gatos", 120.0, "PetFood Co.");
-    Produto* p3 = new ProdutoVeterinario(0, "Antipulgas para Cães", 80.0, "Veterinary Inc.", "REG123", "Cães", "Tópica");
+    Produto* p3 = new ProdutoVeterinario(0, "Antipulgas para Cães", 80.0, "Veterinary Inc.", "REG123", "Cachorro", "Tópica");
     Produto* p4 = new VacinaPerecivel(0, "Vacina para Gatos", 200.0, "VaccineCorp", "REG456", "Gatos", "Intramuscular", "Vírus da Raiva", "Sorotipo A", 1, "2024-12-31", "Refrigerado", 2.0, 8.0);
     this->cadastrar(p1);
     this->cadastrar(p2);

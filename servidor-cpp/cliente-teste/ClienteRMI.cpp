@@ -1,8 +1,6 @@
 #include <iostream>
-#include <string>
-#include <unistd.h>
-#include <arpa/inet.h>
 
+#include "../include/utils/SocketUtils.hpp"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -10,68 +8,130 @@ using namespace std;
 
 int main(){
     /*
-    criacao do socket tcp
-
-    socket() cria um socket e retorna um descritor de arquivo para ele. 
-    O socket é criado com o domínio AF_INET (IPv4), 
-    o tipo SOCK_STREAM (TCP) 
-    e o protocolo 0 (que escolhe automaticamente o protocolo TCP).
+    cliente rmi de teste
+    usa sockeUtils::doOperation
+    doOperation encapsula: criacao do socket, conexao ao servidor, envio da requisicao e recebimento da resposta
     */
 
-    int clienteSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (clienteSocket < 0) {
-        cerr << "Erro ao criar socket" << endl;
+    const string enderecoServidor = "127.0.0.1";
+    const int portaServidor = 8080;
+    cout << "========== Cliente RMI Teste ==========" << endl;
+
+    try
+    {
+        // teste 1: buscarPorId
+        cout << "\n[1] chamando buscarPorId(1)..." << endl;
+
+        json requestJson = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 1},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "buscarPorId"},
+            {"parametros", {
+                {"id", 1}
+            }}
+        };
+
+        // doOperation: envia a requisicao e recebe a resposta como json (byte[] doOperation(RemoteObjectRef o, int methodId, byte[] args))
+        json respostaJson = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson);
+        cout << "Resposta recebida: " << respostaJson.dump(4) << endl;
+
+        // teste 2: listarTodos
+        cout << "\n[2] chamando listarTodos()..." << endl;
+        json requestJson2 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 2},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "listarTodos"},
+            {"parametros", {}}
+        };
+        json respostaJson2 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson2);
+        cout << "Resposta recebida: " << respostaJson2.dump(4) << endl;
+
+        // teste 3: buscarPorEspecie
+        cout << "\n[3] chamando buscarPorEspecie('Cachorro')..." << endl;
+        json requestJson3 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 3},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "buscarPorEspecie"},
+            {"parametros", {
+                {"especie", "Cachorro"}
+            }}
+        };
+        json respostaJson3 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson3);
+        cout << "Resposta recebida: " << respostaJson3.dump(4) << endl;
+
+        //teste 4: calcularValorTotal
+        cout << "\n[4] chamando calcularValorTotal()..." << endl;
+        json requestJson4 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 4},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "calcularValorTotal"},
+            {"parametros", nullptr}
+        };
+        json respostaJson4 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson4);
+        cout << "Resposta recebida: " << respostaJson4.dump(4) << endl;
+
+        // teste 5: remover
+        cout << "\n[5] chamando remover(2)..." << endl;
+        json requestJson5 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 5},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "remover"},
+            {"parametros", {
+                {"id", 2}
+            }}
+        };
+        json respostaJson5 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson5);
+        cout << "Resposta recebida: " << respostaJson5.dump(4) << endl;
+
+        // teste 6: listarTodos apos remover
+        cout << "\n[6] chamando listarTodos() apos remover..." << endl;
+        json requestJson6 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 6},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "listarTodos"},
+            {"parametros", {}}
+        };
+        json respostaJson6 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson6);
+        cout << "Resposta recebida: " << respostaJson6.dump(4) << endl;
+
+        // teste 7: buscarPorId inexistente
+        cout << "\n[7] chamando buscarPorId(999)... (nao existe)" << endl;
+        json requestJson7 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 7},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "buscarPorId"},
+            {"parametros", {
+                {"id", 999}
+            }}
+        };
+        json respostaJson7 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson7);
+        cout << "Resposta recebida: " << respostaJson7.dump(4) << endl;
+
+        // teste 8: chamar metodo inexistente
+        cout << "\n[8] chamando metodo inexistente 'fooBar'..." << endl;
+        json requestJson8 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 8},
+            {"referenciaObj", "ProdutoService"},
+            {"metodoId", "fooBar"},
+            {"parametros", {}}
+        };
+        json respostaJson8 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson8);
+        cout << "Resposta recebida: " << respostaJson8.dump(4) << endl;
+    }
+    catch(const std::exception& e)
+    {
+        cerr << "ERRO: " << e.what() << '\n';
         return 1;
     }
+    
 
-    // configuracao do endereco do servidor
-    sockaddr_in servidorEndereco;
-    servidorEndereco.sin_family = AF_INET;
-    servidorEndereco.sin_port = htons(8080); // porta do servidor
-    inet_pton(AF_INET, "127.0.0.1", &servidorEndereco.sin_addr);
-
-    // conexao ao servidor
-    if (connect(clienteSocket, (sockaddr*)&servidorEndereco, sizeof(servidorEndereco)) < 0) {
-        cerr << "Erro ao conectar ao servidor" << endl;
-        return 1;
-    }
-    cout << "conectado ao servidor RMI" << endl;
-
-    // montagem da requisicao rmi
-    // bucarPorId(1)
-
-    json requestJson = {
-        {"TipoMensagem", "Request"},
-        {"requestId", 1},
-        {"referenciaObj", "ProdutoService"},
-        {"metodoId", "buscarPorId"},
-        {"parametros", {
-            {"id", 1}
-        }}
-    };
-
-    // serializacao da requisicao
-    // dump() converte o objeto json em string
-    string requestStr = requestJson.dump();
-
-    // envio ao servidor
-    send(clienteSocket, requestStr.c_str(), requestStr.size(), 0);
-    cout << "request enviado: " << requestStr << endl;
-
-    // recebimento da resposta
-    char buffer[1024] = {0};
-    int bytesRecebidos = recv(clienteSocket, buffer, 1024, 0);
-    if (bytesRecebidos < 0) {
-        cerr << "Erro ao receber resposta do servidor" << endl;
-        return 1;
-    }
-    // transformar a resposta em string e exibe
-    string respostaStr(buffer);
-    // parse do json recebido
-    json respostaJson = json::parse(respostaStr);
-    cout << "Resposta recebida: " << respostaJson.dump(4) << endl;
-
-    // fechamento do socket
-    close(clienteSocket);
     return 0;
 }

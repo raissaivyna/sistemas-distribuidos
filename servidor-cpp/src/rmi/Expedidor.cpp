@@ -2,12 +2,12 @@
 #include "../include/rmi/Expedidor.hpp"
 
 Reply Expedidor::expedicao(const Request& request){
-    cout << "debug: Expedidor::expedicao chamada com referenciaObj: " << request.referenciaObj << " e metodoId: " << request.metodoId << endl;
+    //cout << "debug: Expedidor::expedicao chamada com referenciaObj: " << request.referenciaObj << " e metodoId: " << request.metodoId << endl;
     if (request.referenciaObj == "ProdutoService")
     {
-        cout << "debug: Referencia para ProdutoService reconhecida, encaminhando para ProdutoSkeleton" << endl;
+        //cout << "debug: Referencia para ProdutoService reconhecida, encaminhando para ProdutoSkeleton" << endl;
         
-        cout << "debug: Criado ProdutoSkeleton, invocando metodo invocacao" << endl;
+        //cout << "debug: Criado ProdutoSkeleton, invocando metodo invocacao" << endl;
 
         return produtoSkeleton.invocacao(request);
     }
