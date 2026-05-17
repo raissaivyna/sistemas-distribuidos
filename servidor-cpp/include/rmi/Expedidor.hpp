@@ -4,7 +4,7 @@
 #pragma once
 #include "../protocolo/Request.hpp"
 #include "../protocolo/Reply.hpp"
-#include "../rmi/ProdutoSkeleton.hpp"
+#include "../skeleton/ProdutoSkeleton.hpp"
 
 
 class Expedidor

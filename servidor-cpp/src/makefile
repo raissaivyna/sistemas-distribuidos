@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -I. -I./rmi -I./servico -I./protocolo -I./modelo
 
-SRCS = main.cpp $(wildcard rmi/*.cpp) $(wildcard servico/*.cpp) $(wildcard protocolo/*.cpp) $(wildcard modelo/*.cpp)
+SRCS = main.cpp $(wildcard rmi/*.cpp) $(wildcard servico/*.cpp) $(wildcard protocolo/*.cpp) $(wildcard modelo/*.cpp) $(wildcard skeleton/*.cpp)
 OBJS = $(SRCS:.cpp=.o)
 TARGET = main
 

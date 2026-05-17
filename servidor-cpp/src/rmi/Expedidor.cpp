@@ -1,4 +1,4 @@
-#include "../include/rmi/ProdutoSkeleton.hpp"
+#include "../include/skeleton/ProdutoSkeleton.hpp"
 #include "../include/rmi/Expedidor.hpp"
 
 Reply Expedidor::expedicao(const Request& request){

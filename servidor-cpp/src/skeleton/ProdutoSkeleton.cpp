@@ -1,4 +1,4 @@
-#include "../include/rmi/ProdutoSkeleton.hpp"
+#include "../include/skeleton/ProdutoSkeleton.hpp"
 
 Reply ProdutoSkeleton::invocacao(const Request& request){
     Reply reply;
