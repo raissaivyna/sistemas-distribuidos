@@ -25,7 +25,7 @@ int main(){
         json requestJson = {
             {"TipoMensagem", "Request"},
             {"requestId", 1},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "buscarPorId"},
             {"parametros", {
                 {"id", 1}
@@ -41,7 +41,7 @@ int main(){
         json requestJson2 = {
             {"TipoMensagem", "Request"},
             {"requestId", 2},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "listarTodos"},
             {"parametros", {}}
         };
@@ -53,7 +53,7 @@ int main(){
         json requestJson3 = {
             {"TipoMensagem", "Request"},
             {"requestId", 3},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "buscarPorEspecie"},
             {"parametros", {
                 {"especie", "Cachorro"}
@@ -67,7 +67,7 @@ int main(){
         json requestJson4 = {
             {"TipoMensagem", "Request"},
             {"requestId", 4},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "calcularValorTotal"},
             {"parametros", nullptr}
         };
@@ -79,7 +79,7 @@ int main(){
         json requestJson5 = {
             {"TipoMensagem", "Request"},
             {"requestId", 5},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "remover"},
             {"parametros", {
                 {"id", 2}
@@ -93,7 +93,7 @@ int main(){
         json requestJson6 = {
             {"TipoMensagem", "Request"},
             {"requestId", 6},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "listarTodos"},
             {"parametros", {}}
         };
@@ -105,7 +105,7 @@ int main(){
         json requestJson7 = {
             {"TipoMensagem", "Request"},
             {"requestId", 7},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "buscarPorId"},
             {"parametros", {
                 {"id", 999}
@@ -119,12 +119,142 @@ int main(){
         json requestJson8 = {
             {"TipoMensagem", "Request"},
             {"requestId", 8},
-            {"referenciaObj", "ProdutoService"},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
             {"metodoId", "fooBar"},
             {"parametros", {}}
         };
         json respostaJson8 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson8);
         cout << "Resposta recebida: " << respostaJson8.dump(4) << endl;
+
+        // teste agora do EstoqueService para garantir que o mesmo ProdutoServico é compartilhado entre os skeletons e a consistencia dos dados entre os dois serviços
+        // teste 9: criarEstoque
+        cout << "\n[9] chamando criarEstoque('Deposito Central')..." << endl;
+        json requestJson9 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 9},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "criarEstoque"},
+            {"parametros", {
+                {"local", "Deposito Central"}
+            }}
+        };
+        json respostaJson9 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson9);
+        cout << "Resposta recebida: " << respostaJson9.dump(4) << endl;
+
+        //  teste 10: listarEstoques
+        cout << "\n[10] chamando listarEstoques()..." << endl;  
+        json requestJson10 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 10},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "listarEstoques"},
+            {"parametros", {}}
+        };
+        json respostaJson10 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson10);
+        cout << "Resposta recebida: " << respostaJson10.dump(4) << endl;
+
+        // teste 11: entradaProduto (adicionar produto com id 1 ao estoque criado)
+        cout << "\n[11] chamando entradaProduto(estoqueId: 1, produtoId: 1)..." << endl;
+        json requestJson11 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 11},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "entradaProduto"},
+            {"parametros", {
+                {"estoqueId", 1},
+                {"produtoId", 1}
+            }}
+        };
+        json respostaJson11 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson11);
+        cout << "Resposta recebida: " << respostaJson11.dump(4) << endl;
+
+        // teste 12: listarEstoques novamente para verificar se o produto foi adicionado ao estoque
+        cout << "\n[12] chamando listarEstoques() novamente para verificar se o produto foi adicionado ao estoque..." << endl;  
+        json requestJson12 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 12},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "listarEstoques"},
+            {"parametros", {}}
+        };
+        json respostaJson12 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson12);
+        cout << "Resposta recebida: " << respostaJson12.dump(4) << endl;
+
+        // teste 13: alertarVencidos (verificar se o produto adicionado ao estoque aparece como vencido ou nao, dependendo da data de validade do produto)
+        cout << "\n[13] chamando alertarVencidos() para verificar se o produto adicionado ao estoque aparece como vencido ou nao..." << endl;  
+        json requestJson13 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 13},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "alertarVencidos"},
+            {"parametros", {}}
+        };
+        json respostaJson13 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson13);
+        cout << "Resposta recebida: " << respostaJson13.dump(4) << endl;
+
+        // teste 14: saidaProduto (remover o produto do estoque)
+        cout << "\n[14] chamando saidaProduto(estoqueId: 1, produtoId: 1) para remover o produto do estoque..." << endl;
+        json requestJson14 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 14},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "saidaProduto"},
+            {"parametros", {
+                {"estoqueId", 1},
+                {"produtoId", 1}
+            }}
+        };
+        json respostaJson14 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson14);
+        cout << "Resposta recebida: " << respostaJson14.dump(4) << endl;
+
+        // teste 15: listarEstoques novamente para verificar se o produto foi removido do estoque
+        cout << "\n[15] chamando listarEstoques() novamente para verificar se o produto foi removido do estoque..." << endl;  
+        json requestJson15 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 15},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "listarEstoques"},
+            {"parametros", {}}
+        };
+        json respostaJson15 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson15);
+        cout << "Resposta recebida: " << respostaJson15.dump(4) << endl;
+
+        // teste 16: alertarVencidos novamente para verificar se o produto removido do estoque nao aparece mais como vencido
+        cout << "\n[16] chamando alertarVencidos() novamente para verificar se o produto removido do estoque nao aparece mais como vencido..." << endl;  
+        json requestJson16 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 16},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "alertarVencidos"},
+            {"parametros", {}}
+        };
+        json respostaJson16 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson16);
+        cout << "Resposta recebida: " << respostaJson16.dump(4) << endl;
+
+        // teste 17: chamar metodo do EstoqueService que nao existe no ProdutoService para garantir que o Expedidor encaminha a requisicao para o skeleton correto e retorna erro de metodo nao encontrado quando o metodo nao existe no skeleton
+        cout << "\n[17] chamando metodo 'fooBar' no EstoqueService para garantir que o Expedidor encaminha a requisicao para o skeleton correto e retorna erro de metodo nao encontrado quando o metodo nao existe no skeleton..." << endl;
+        json requestJson17 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 17},
+            {"referenciaObj", {{"objetoId", 2}, {"NomeObjeto", "EstoqueService"}}},
+            {"metodoId", "fooBar"},
+            {"parametros", {}}
+        };
+        json respostaJson17 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson17);
+        cout << "Resposta recebida: " << respostaJson17.dump(4) << endl;
+
+        // teste 18: chamar metodo do ProdutoService que nao existe no EstoqueService para garantir que o Expedidor encaminha a requisicao para o skeleton correto e retorna erro de metodo nao encontrado quando o metodo nao existe no skeleton
+        cout << "\n[18] chamando metodo 'fooBar' no ProdutoService para garantir que o Expedidor encaminha a requisicao para o skeleton correto e retorna erro de metodo nao encontrado quando o metodo nao existe no skeleton..." << endl;
+        json requestJson18 = {
+            {"TipoMensagem", "Request"},
+            {"requestId", 18},
+            {"referenciaObj", {{"objetoId", 1}, {"NomeObjeto", "ProdutoService"}}},
+            {"metodoId", "fooBar"},
+            {"parametros", {}}
+        };
+        json respostaJson18 = SocketUtils::doOperation(enderecoServidor, portaServidor, requestJson18);
+        cout << "Resposta recebida: " << respostaJson18.dump(4) << endl;
+
     }
     catch(const std::exception& e)
     {
