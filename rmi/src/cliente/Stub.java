@@ -6,7 +6,7 @@ import serializacao.JSON;
 import servidor.ClinicaRemota;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -30,9 +30,9 @@ public class Stub implements ClinicaRemota {
     private final RemoteObjectRef      ref;
     private final RequestReplyProtocol protocolo;
 
-    public Stub(String host, int porta, DatagramSocket socket) {
-        this.ref       = new RemoteObjectRef(host, porta, "ClinicaServico");
-        this.protocolo = new RequestReplyProtocol(socket);
+    public Stub(String host, int porta) {
+        this.ref       = new RemoteObjectRef(host, porta, "ProdutoService");
+        this.protocolo = new RequestReplyProtocol();
     }
 
     // ── Método 1: listarProdutos ─────────────────────────────────────────────
