@@ -16,18 +16,15 @@ javac -encoding UTF-8 -d $OUT \
   $SRC/serializacao/JSON.java \
   $SRC/servidor/ClinicaRemota.java \
   $SRC/servidor/ClinicaImpl.java \
+  $SRC/servidor/EstoqueImpl.java \
   $SRC/servidor/ServidorRMI.java \
-  $SRC/cliente/Stub.java \
   $SRC/cliente/ClienteRMI.java
-
 if [ $? -ne 0 ]; then echo "Erro de compilacao."; exit 1; fi
 echo "Compilado com sucesso!"
 echo ""
-
 case "$1" in
   servidor) echo "Iniciando ServidorRMI — TCP porta 8080..."
             java -cp $OUT servidor.ServidorRMI ;;
-  cliente)  echo "Iniciando ClienteRMI..."
-            java -cp $OUT cliente.ClienteRMI ;;
+  cliente)  java -cp $OUT cliente.ClienteRMI ;;
   *)        echo "Use: bash compile_run.sh servidor | cliente" ;;
 esac

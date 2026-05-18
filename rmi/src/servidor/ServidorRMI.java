@@ -11,117 +11,181 @@ public class ServidorRMI {
 
     static final int PORTA = 8080;
 
+    static final ClinicaImpl  produtoService = new ClinicaImpl();
+    static final EstoqueImpl  estoqueService = new EstoqueImpl(produtoService);
+
+    // ── Wrapper status + valor ────────────────────────────────────────────────
+
+    static class Resultado {
+        String status, valor;
+        Resultado(String status, String valor) { this.status = status; this.valor = valor; }
+        static Resultado ok(String v)   { return new Resultado("OK",   v); }
+        static Resultado erro(String v) { return new Resultado("ERRO", "\"" + v + "\""); }
+    }
+
     public static void main(String[] args) throws Exception {
-        ClinicaImpl impl = new ClinicaImpl();
-
-        System.out.println("╔══════════════════════════════════════════════╗");
-        System.out.println("║   ServidorRMI Java (replica C++) — TCP 8080  ║");
-        System.out.println("╚══════════════════════════════════════════════╝\n");
-
         try (ServerSocket ss = new ServerSocket(PORTA)) {
-            System.out.println("Aguardando conexoes na porta " + PORTA + "...");
             while (true) {
                 Socket cliente = ss.accept();
-                System.out.println("Conexao aceita: " + cliente.getInetAddress());
-                new Thread(() -> tratarCliente(cliente, impl)).start();
+                new Thread(() -> {
+                    try {
+                        String requestStr = getRequest(cliente);
+                        String replyStr   = expedicao(requestStr);
+                        sendReply(cliente, replyStr);
+                    } catch (Exception e) {
+                        System.err.println("erro: " + e.getMessage());
+                    }
+                }).start();
             }
         }
     }
 
-    static void tratarCliente(Socket socket, ClinicaImpl impl) {
+    static String getRequest(Socket socket) throws IOException {
+        BufferedReader in = new BufferedReader(
+            new InputStreamReader(socket.getInputStream()));
+        String linha = in.readLine();
+        return linha == null ? "{}" : linha;
+    }
+
+    static void sendReply(Socket socket, String replyJson) throws IOException {
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+        out.println(replyJson);
+        out.flush();
+        socket.close();
+    }
+
+    // ── Expedidor ─────────────────────────────────────────────────────────────
+
+    static String expedicao(String requestStr) {
+        int    requestId  = getInt(requestStr, "requestId");
+        String nomeObjeto = getNomeObjeto(requestStr);
+        String metodoId   = JSON.get(requestStr, "metodoId");
+        String parametros = extrairParametros(requestStr);
+
+        Resultado res;
         try {
-            BufferedReader in  = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
-            PrintWriter    out = new PrintWriter(socket.getOutputStream(), true);
-
-            // Lê UMA linha — cliente envia o request em uma linha só via println
-            String requestStr = in.readLine();
-            if (requestStr == null || requestStr.isBlank()) {
-                socket.close();
-                return;
-            }
-
-            System.out.println("Request recebido: " + requestStr);
-
-            String referenciaObj = JSON.get(requestStr, "referenciaObj");
-            String metodoId      = JSON.get(requestStr, "metodoId");
-            String parametros    = extrairParametros(requestStr);
-            int    requestId     = JSON.getInt(requestStr, "requestId");
-
-            System.out.println("debug: referenciaObj=" + referenciaObj +
-                               " metodoId=" + metodoId);
-
-            String resultado;
-            String status = "OK";
-
-            if ("ProdutoService".equals(referenciaObj)) {
-                resultado = despachar(impl, metodoId, parametros);
+            if ("ProdutoService".equals(nomeObjeto)) {
+                res = produtoSkeleton(metodoId, parametros);
+            } else if ("EstoqueService".equals(nomeObjeto)) {
+                res = estoqueSkeleton(metodoId, parametros);
             } else {
-                status    = "ERRO";
-                resultado = "\"Objeto remoto nao encontrado\"";
+                res = Resultado.erro("Objeto remoto nao encontrado");
             }
-
-            String replyStr = "{"
-                + "\"requestId\":"  + requestId + ","
-                + "\"status\":\""   + status    + "\","
-                + "\"resultado\":"  + resultado
-                + "}";
-
-            // Envia resposta e fecha conexão — igual ao C++
-            out.println(replyStr);
-            out.flush();
-            socket.close();
-
-            System.out.println("Reply enviado: " +
-                replyStr.substring(0, Math.min(80, replyStr.length())));
-
         } catch (Exception e) {
-            System.err.println("Erro ao tratar cliente: " + e.getMessage());
+            res = Resultado.erro(e.getMessage());
         }
+
+        return "{"
+            + "\"requestId\":"  + requestId    + ","
+            + "\"status\":\""   + res.status   + "\","
+            + "\"resultado\":"  + res.valor
+            + "}";
     }
 
-    static String despachar(ClinicaImpl impl, String metodoId, String params) {
-        System.out.println("invocacao: " + metodoId);
+    // ── ProdutoSkeleton ──────────────────────────────────────────────────────
+
+    static Resultado produtoSkeleton(String metodoId, String params) {
         switch (metodoId) {
 
             case "listarTodos":
             case "listarProdutos":
-                return JSON.serializarLista(impl.listarProdutos());
+                return Resultado.ok(JSON.serializarLista(produtoService.listarProdutos()));
 
             case "buscarPorId": {
-                int id = JSON.getInt(params, "id");
-                for (Produto p : impl.listarProdutos())
-                    if (p.getId() == id) return JSON.serializar(p);
-                return "\"Produto nao encontrado\"";
+                int id = getInt(params, "id");
+                for (Produto p : produtoService.listarProdutos())
+                    if (p.getId() == id) return Resultado.ok(JSON.serializar(p));
+                return Resultado.erro("Produto nao encontrado");
             }
 
             case "buscarPorEspecie":
-                return JSON.serializarLista(
-                    impl.buscarPorEspecie(JSON.get(params, "especie")));
+                return Resultado.ok(JSON.serializarLista(
+                    produtoService.buscarPorEspecie(JSON.get(params, "especie"))));
 
             case "cadastrarProduto": {
                 Produto novo = JSON.desserializarProduto(params);
-                int id = impl.cadastrarProduto(novo);
-                return "{\"id\":" + id + ",\"status\":\"cadastrado\"}";
+                int id = produtoService.cadastrarProduto(novo);
+                return Resultado.ok("{\"id\":" + id + ",\"status\":\"cadastrado\"}");
+            }
+
+            case "remover": {
+                int id = getInt(params, "id");
+                boolean ok = produtoService.remover(id);
+                return ok
+                    ? Resultado.ok("{\"status\":\"removido\",\"id\":" + id + "}")
+                    : Resultado.erro("Produto nao encontrado");
             }
 
             case "listarVencidos":
-                return JSON.serializarLista(impl.listarVencidos());
+                return Resultado.ok(JSON.serializarLista(produtoService.listarVencidos()));
 
-            case "gerarRelatorio":
-                return "\"" + impl.gerarRelatorio()
-                    .replace("\n", "\\n")
-                    .replace("\"", "\\\"") + "\"";
-
-            case "registrarPedido": {
-                PedidoReposicao pedido = desserializarPedido(params);
-                return "\"" + impl.registrarPedido(pedido)
-                    .replace("\"", "\\\"") + "\"";
+            case "calcularValorTotal": {
+                double total = produtoService.listarProdutos()
+                    .stream().mapToDouble(Produto::getPreco).sum();
+                return Resultado.ok(String.valueOf(total));
             }
 
+            case "gerarRelatorio":
+                return Resultado.ok("\"" + produtoService.gerarRelatorio()
+                    .replace("\n", "\\n").replace("\"", "\\\"") + "\"");
+
             default:
-                return "\"Metodo desconhecido: " + metodoId + "\"";
+                return Resultado.erro("Metodo nao encontrado: " + metodoId);
         }
+    }
+
+    // ── EstoqueSkeleton ──────────────────────────────────────────────────────
+
+    static Resultado estoqueSkeleton(String metodoId, String params) {
+        switch (metodoId) {
+
+            case "criarEstoque": {
+                String local = JSON.get(params, "local");
+                Estoque e = estoqueService.criarEstoque(local);
+                return Resultado.ok(JSON.serializarEstoqueResumido(e));
+            }
+
+            case "listarEstoques":
+                return Resultado.ok(
+                    JSON.serializarListaEstoquesResumida(estoqueService.listarEstoques()));
+
+            case "entradaProduto": {
+                int estoqueId = getInt(params, "estoqueId");
+                int produtoId = getInt(params, "produtoId");
+                boolean ok = estoqueService.entradaProduto(estoqueId, produtoId);
+                return ok
+                    ? Resultado.ok("\"Produto adicionado ao estoque com sucesso\"")
+                    : Resultado.erro("Estoque ou produto nao encontrado");
+            }
+
+            case "saidaProduto": {
+                int estoqueId = getInt(params, "estoqueId");
+                int produtoId = getInt(params, "produtoId");
+                boolean ok = estoqueService.saidaProduto(estoqueId, produtoId);
+                return ok
+                    ? Resultado.ok("\"Produto removido do estoque com sucesso\"")
+                    : Resultado.erro("Estoque ou produto nao encontrado");
+            }
+
+            case "alertarVencidos":
+                return Resultado.ok(
+                    estoqueService.alertarVencidosJson());
+
+            default:
+                return Resultado.erro("Metodo nao encontrado: " + metodoId);
+        }
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+
+    static String getNomeObjeto(String json) {
+        String busca = "\"referenciaObj\":";
+        int ini = json.indexOf(busca);
+        if (ini < 0) return "";
+        ini += busca.length();
+        int fim = json.indexOf('}', ini);
+        if (fim < 0) return "";
+        return JSON.get(json.substring(ini, fim + 1), "NomeObjeto");
     }
 
     static String extrairParametros(String json) {
@@ -129,8 +193,8 @@ public class ServidorRMI {
         int ini = json.indexOf(busca);
         if (ini < 0) return "{}";
         ini += busca.length();
-        char first = json.charAt(ini);
-        if (first == '{') {
+        if (ini >= json.length()) return "{}";
+        if (json.charAt(ini) == '{') {
             int depth = 0, fim = ini;
             for (; fim < json.length(); fim++) {
                 if (json.charAt(fim) == '{') depth++;
@@ -141,17 +205,5 @@ public class ServidorRMI {
         return "{}";
     }
 
-    static PedidoReposicao desserializarPedido(String json) {
-        PedidoReposicao p = new PedidoReposicao(
-            0, JSON.get(json, "responsavel"), JSON.get(json, "dataHora"));
-        int iStart = json.indexOf("\"itens\":[");
-        if (iStart >= 0) {
-            int aStart = json.indexOf('[', iStart);
-            int aEnd   = json.lastIndexOf(']');
-            if (aStart >= 0 && aEnd > aStart)
-                JSON.desserializarLista(json.substring(aStart, aEnd + 1))
-                    .forEach(p::adicionarItem);
-        }
-        return p;
-    }
+    static int getInt(String json, String chave) { return JSON.getInt(json, chave); }
 }

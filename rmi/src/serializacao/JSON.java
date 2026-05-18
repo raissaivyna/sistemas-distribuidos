@@ -60,6 +60,44 @@ public class JSON {
         return sb.append("]").toString();
     }
 
+    // ── Estoque completo (uso interno) ───────────────────────────────────────
+
+    public static String serializarEstoque(Estoque e) {
+        return "{\"id\":" + e.getId() +
+               ",\"local\":\"" + esc(e.getLocal()) + "\"" +
+               ",\"produtos\":" + serializarLista(e.getProdutos()) +
+               "}";
+    }
+
+    public static String serializarListaEstoques(List<Estoque> lista) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < lista.size(); i++) {
+            sb.append(serializarEstoque(lista.get(i)));
+            if (i < lista.size() - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    // ── Estoque resumido (para respostas ao cliente) ──────────────────────────
+
+    public static String serializarEstoqueResumido(Estoque e) {
+        return "{\"id\":" + e.getId() +
+               ",\"local\":\"" + esc(e.getLocal()) + "\"" +
+               ",\"totalProdutos\":" + e.getProdutos().size() +
+               "}";
+    }
+
+    public static String serializarListaEstoquesResumida(List<Estoque> lista) {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < lista.size(); i++) {
+            sb.append(serializarEstoqueResumido(lista.get(i)));
+            if (i < lista.size() - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    // ── Pedido ───────────────────────────────────────────────────────────────
+
     public static String serializarPedido(PedidoReposicao p) {
         return obj(num("id", p.getId()),
                    str("responsavel", p.getResponsavel()),
@@ -120,7 +158,7 @@ public class JSON {
         return lista;
     }
 
-    // ── Helpers de construção ────────────────────────────────────────────────
+    // ── Helpers de construção JSON ───────────────────────────────────────────
 
     static String obj(String... campos) { return "{" + String.join(",", campos) + "}"; }
     static String str(String k, String v)  { return "\""+k+"\":\""+esc(v)+"\""; }
@@ -128,9 +166,9 @@ public class JSON {
     static String num(String k, double v)  { return "\""+k+"\":"+v; }
     static String bool(String k, boolean v){ return "\""+k+"\":"+v; }
     static String raw(String k, String v)  { return "\""+k+"\":"+v; }
-    static String esc(String s)            { return s == null ? "" : s.replace("\"","\\\""); }
+    public static String esc(String s)     { return s == null ? "" : s.replace("\"","\\\""); }
 
-    // ── Helpers de leitura ───────────────────────────────────────────────────
+    // ── Helpers de leitura JSON ──────────────────────────────────────────────
 
     public static String get(String json, String chave) {
         if (json == null) return "";

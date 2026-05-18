@@ -16,13 +16,11 @@ public class ClinicaImpl implements ClinicaRemota {
 
     @Override
     public List<Produto> listarProdutos() {
-        System.out.println("[IMPL] listarProdutos() → " + repositorio.size());
         return new ArrayList<>(repositorio);
     }
 
     @Override
     public List<Produto> buscarPorEspecie(String especie) {
-        System.out.println("[IMPL] buscarPorEspecie('" + especie + "')");
         List<Produto> resultado = new ArrayList<>();
         for (Produto p : repositorio) {
             if (p instanceof ProdutoVeterinario) {
@@ -38,8 +36,11 @@ public class ClinicaImpl implements ClinicaRemota {
     public int cadastrarProduto(Produto produto) {
         produto.setId(proximoId.getAndIncrement());
         repositorio.add(produto);
-        System.out.println("[IMPL] cadastrarProduto() id=" + produto.getId() + " '" + produto.getNome() + "'");
         return produto.getId();
+    }
+
+    public boolean remover(int id) {
+        return repositorio.removeIf(p -> p.getId() == id);
     }
 
     @Override
@@ -51,7 +52,6 @@ public class ClinicaImpl implements ClinicaRemota {
                 if (vp.isVencido()) vencidas.add(vp);
             }
         }
-        System.out.println("[IMPL] listarVencidos() → " + vencidas.size());
         return vencidas;
     }
 
@@ -67,7 +67,6 @@ public class ClinicaImpl implements ClinicaRemota {
             }
         }
         long quimio = repositorio.size() - vacinas;
-        System.out.println("[IMPL] gerarRelatorio()");
         return "=== Relatorio do Estoque ===\n" +
                "Total de produtos  : " + repositorio.size() + "\n" +
                "Vacinas pereciveis : " + vacinas + "\n" +
@@ -84,17 +83,9 @@ public class ClinicaImpl implements ClinicaRemota {
             pedido.getResponsavel(), pedido.getDataHora());
         for (Produto item : pedido.getItens()) novo.adicionarItem(item);
         pedidos.add(novo);
-        String res = "Pedido #" + novo.getId() + " registrado por '" +
-                     novo.getResponsavel() + "' — " + novo.getItens().size() +
-                     " item(ns) — R$" + String.format("%.2f", novo.getValorTotal());
-        System.out.println("[IMPL] " + res);
-        return res;
-    }
-
-    public boolean remover(int id) {
-        boolean ok = repositorio.removeIf(p -> p.getId() == id);
-        System.out.println("[IMPL] remover(id=" + id + ") -> " + ok);
-        return ok;
+        return "Pedido #" + novo.getId() + " registrado por '" +
+               novo.getResponsavel() + "' - " + novo.getItens().size() +
+               " item(ns) - R$" + String.format("%.2f", novo.getValorTotal());
     }
 
     private void popularDadosIniciais() {
@@ -106,6 +97,5 @@ public class ClinicaImpl implements ClinicaRemota {
             "BR-003","Bovino","Intramuscular","01/03/2027","Refrigerado 4-8C",4.0,8.0));
         cadastrarProduto(new ProdutoVeterinario(0,"Amoxicilina 500mg",45.90,"MSD",
             "BR-004","Canino","Oral"));
-        System.out.println("[IMPL] " + repositorio.size() + " produtos carregados.");
     }
 }

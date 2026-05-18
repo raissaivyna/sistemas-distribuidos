@@ -1,82 +1,167 @@
 package cliente;
 
 import entidade.*;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import rmi.RemoteObjectRef;
+import rmi.RequestReplyProtocol;
+import serializacao.JSON;
 
+import java.io.IOException;
+import java.util.List;
+/*1--- int id = produtoService.buscarPorID(1); */
 public class ClienteRMI {
 
     static final String HOST  = "localhost";
     static final int    PORTA = 8080;
 
+    static RequestReplyProtocol protocolo = new RequestReplyProtocol();
+
     public static void main(String[] args) throws Exception {
 
-        System.out.println("╔══════════════════════════════════════════════╗");
-        System.out.println("║   Cliente RMI — Clinica Veterinaria          ║");
-        System.out.println("╚══════════════════════════════════════════════╝\n");
+        System.out.println("========== Cliente RMI Java ==========\n");
 
-        Stub clinica = new Stub(HOST, PORTA);
+        System.out.println("[1] chamando buscarPorId(1)...");
+        print(chamar("ProdutoService", 1, "buscarPorId", "{\"id\":1}", 1));
 
-        titulo("1 — listarProdutos() [por referencia]");
-        List<Produto> todos = clinica.listarProdutos();
-        todos.forEach(p -> System.out.println("  " + p));
+        System.out.println("[2] chamando listarTodos()...");
+        print(chamar("ProdutoService", 1, "listarTodos", "{}", 2));
 
-        titulo("2 — buscarPorEspecie('Canino') [por valor]");
-        List<Produto> caninos = clinica.buscarPorEspecie("Canino");
-        System.out.println("  Encontrados: " + caninos.size());
-        caninos.forEach(p -> System.out.println("  " + p));
+        System.out.println("[3] chamando buscarPorEspecie('Canino')...");
+        print(chamar("ProdutoService", 1, "buscarPorEspecie", "{\"especie\":\"Canino\"}", 3));
 
-        titulo("3 — cadastrarProduto(VacinaPerecivel) [por valor]");
-        VacinaPerecivel novaVacina = new VacinaPerecivel(
-            0, "Vacina Leishmaniose", 89.00, "MSD",
-            "BR-099", "Canino", "Subcutanea",
-            "20/06/2027", "Refrigerado 2-8C", 2.0, 8.0);
-        int novoId = clinica.cadastrarProduto(novaVacina);
-        System.out.println("  Produto cadastrado com id=" + novoId);
+        System.out.println("[4] chamando calcularValorTotal()...");
+        print(chamar("ProdutoService", 1, "calcularValorTotal", "{}", 4));
 
-        titulo("4 — listarVencidos() [por referencia]");
-        List<VacinaPerecivel> vencidas = clinica.listarVencidos();
-        if (vencidas.isEmpty()) {
-            System.out.println("  Nenhuma vacina vencida.");
-        } else {
-            System.out.println("  " + vencidas.size() + " vencida(s):");
-            vencidas.forEach(v ->
-                System.out.println("  VENCIDA: " + v.getNome() +
-                                   " | validade: " + v.getDataValidade()));
-        }
+        System.out.println("[5] chamando remover(2)...");
+        print(chamar("ProdutoService", 1, "remover", "{\"id\":2}", 5));
 
-        titulo("5 — Cadastrar ProdutoVeterinario e relistar");
-        ProdutoVeterinario antiparasitario = new ProdutoVeterinario(
-            0, "Ivermectina 1%", 23.50, "Ouro Fino",
-            "BR-010", "Bovino", "Subcutanea");
-        clinica.cadastrarProduto(antiparasitario);
-        List<Produto> bovinos = clinica.buscarPorEspecie("Bovino");
-        System.out.println("  Produtos para Bovino: " + bovinos.size());
-        bovinos.forEach(p -> System.out.println("  " + p));
+        System.out.println("[6] chamando listarTodos() apos remover...");
+        print(chamar("ProdutoService", 1, "listarTodos", "{}", 6));
 
-        titulo("6 — registrarPedido(PedidoReposicao) [por valor]");
-        String agora = LocalDateTime.now()
-            .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
-        PedidoReposicao pedido = new PedidoReposicao(0, "dr.joao", agora);
-        pedido.adicionarItem(new VacinaPerecivel(
-            0, "Vacina Anti-Rabica", 32.50, "Zoetis",
-            "BR-001", "Canino", "Subcutanea",
-            "15/08/2027", "Refrigerado 2-8C", 2.0, 8.0));
-        pedido.adicionarItem(new ProdutoVeterinario(
-            0, "Amoxicilina 500mg", 45.90, "MSD",
-            "BR-004", "Canino", "Oral"));
-        System.out.println("  " + clinica.registrarPedido(pedido));
+        System.out.println("[7] chamando buscarPorId(999)... (nao existe)");
+        print(chamar("ProdutoService", 1, "buscarPorId", "{\"id\":999}", 7));
 
-        titulo("7 — gerarRelatorio() [por referencia]");
-        System.out.println(clinica.gerarRelatorio());
+        System.out.println("[8] chamando metodo inexistente 'fooBar'...");
+        print(chamar("ProdutoService", 1, "fooBar", "{}", 8));
 
-        System.out.println("\nCliente encerrado.");
+        System.out.println("[9] chamando criarEstoque('Deposito Central')...");
+        print(chamar("EstoqueService", 2, "criarEstoque", "{\"local\":\"Deposito Central\"}", 9));
+
+        System.out.println("[10] chamando listarEstoques()...");
+        print(chamar("EstoqueService", 2, "listarEstoques", "{}", 10));
+
+        System.out.println("[11] chamando entradaProduto(estoqueId:1, produtoId:1)...");
+        print(chamar("EstoqueService", 2, "entradaProduto", "{\"estoqueId\":1,\"produtoId\":1}", 11));
+
+        System.out.println("[12] chamando listarEstoques() apos entrada...");
+        print(chamar("EstoqueService", 2, "listarEstoques", "{}", 12));
+
+        System.out.println("[13] chamando alertarVencidos()...");
+        print(chamar("EstoqueService", 2, "alertarVencidos", "{}", 13));
+
+        System.out.println("[14] chamando saidaProduto(estoqueId:1, produtoId:1)...");
+        print(chamar("EstoqueService", 2, "saidaProduto", "{\"estoqueId\":1,\"produtoId\":1}", 14));
+
+        System.out.println("[15] chamando listarEstoques() apos saida...");
+        print(chamar("EstoqueService", 2, "listarEstoques", "{}", 15));
+
+        System.out.println("[16] chamando alertarVencidos() apos saida...");
+        print(chamar("EstoqueService", 2, "alertarVencidos", "{}", 16));
+
+        System.out.println("[17] chamando 'fooBar' no EstoqueService...");
+        print(chamar("EstoqueService", 2, "fooBar", "{}", 17));
+
+        System.out.println("[18] chamando 'fooBar' no ProdutoService...");
+        print(chamar("ProdutoService", 1, "fooBar", "{}", 18));
+
+        System.out.println("========== Fim dos testes ==========");
     }
 
-    static void titulo(String t) {
-        System.out.println("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        System.out.println("  " + t);
-        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+    static void print(String json) {
+        System.out.println("Resposta recebida: " + prettyPrint(json));
+        System.out.println();
+    }
+
+    // ── Pretty-print JSON manual ─────────────────────────────────────────────
+
+    static String prettyPrint(String json) {
+        if (json == null || json.isBlank()) return json;
+        StringBuilder sb     = new StringBuilder();
+        int           indent = 0;
+        boolean       inStr  = false;
+
+        for (int i = 0; i < json.length(); i++) {
+            char c = json.charAt(i);
+
+            // controla se estamos dentro de uma string
+            if (c == '"' && (i == 0 || json.charAt(i - 1) != '\\')) {
+                inStr = !inStr;
+                sb.append(c);
+                continue;
+            }
+
+            if (inStr) { sb.append(c); continue; }
+
+            switch (c) {
+                case '{': case '[':
+                    sb.append(c).append('\n').append(spaces(++indent));
+                    break;
+                case '}': case ']':
+                    sb.append('\n').append(spaces(--indent)).append(c);
+                    break;
+                case ',':
+                    sb.append(c).append('\n').append(spaces(indent));
+                    break;
+                case ':':
+                    sb.append(": ");
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    static String spaces(int n) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n * 4; i++) sb.append(' ');
+        return sb.toString();
+    }
+
+    // ── Envio da requisição ──────────────────────────────────────────────────
+/*--6---O método chamar() no ClienteRMI monta a mensagem no formato exato que o servidor espera */
+    static String chamar(String nomeObjeto, int objetoId,
+                          String metodoId, String parametros,
+                          int requestId) throws IOException {
+
+        String referenciaObj = "{\"objetoId\":" + objetoId +
+                               ",\"NomeObjeto\":\"" + nomeObjeto + "\"}";
+
+        String requestJson = "{"
+            + "\"TipoMensagem\":\"Request\","
+            + "\"requestId\":"    + requestId    + ","
+            + "\"referenciaObj\":" + referenciaObj + ","
+            + "\"metodoId\":\""   + metodoId     + "\","
+            + "\"parametros\":"   + parametros
+            + "}";
+//4---
+/*Cliente cria uma referencia assim :
+já que o trabalho pede passagem por referência para a execução de objetos remotos.
+
+--ultimo
+ex:  chamar("ProdutoService", 1, "buscarPorId", "{\"id\":1}", 1)
+
+{
+    "TipoMensagem": "Request",
+    "requestId": 1,
+    "referenciaObj": { "objetoId": 1, "NomeObjeto": "ProdutoService" },
+    "metodoId": "buscarPorId",
+    "parametros": { "id": 1 }
+}
+
+ */
+        RemoteObjectRef ref = new RemoteObjectRef(HOST, PORTA, nomeObjeto);
+        byte[] resposta = protocolo.doOperation(ref, metodoId,
+                                                 requestJson.getBytes("UTF-8"));
+        return new String(resposta, "UTF-8");
     }
 }
