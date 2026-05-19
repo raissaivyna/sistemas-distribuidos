@@ -6,7 +6,7 @@ requisição-resposta (seção 5.2 do livro texto).
 O **servidor** é implementado em **C++** e o **cliente** em **Java**.
 Ambos se comunicam via **TCP na porta 8080** trocando mensagens **JSON**.
 
-# [Relatório da Entrega 2](raissaivyna/sistemas-distribuidos/Relatorio_Trabalho2_RMI.docx.pdf)
+# [Relatório da Entrega 2](./Relatorio_Trabalho2_RMI.docx.pdf)
 
 ---
 
