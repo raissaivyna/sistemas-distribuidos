@@ -1,191 +1,108 @@
-# 🐾 Sistema Distribuído — Clínica Veterinária
+# RMI Sistema — Servidor C++ + Cliente Java
 
-Projeto desenvolvido para a disciplina de Sistemas Distribuídos, com foco em comunicação cliente-servidor, serialização de dados e uso de múltiplos protocolos (TCP e UDP multicast).
+Projeto de sistemas distribuídos com comunicação RMI via protocolo
+requisição-resposta (seção 5.2 do livro texto).
 
-Apresentação do projeto:
-https://youtu.be/GZ2-29UqJ4U
-
----
-## Desenvolvedoras
-- Raissa Ívyna
-- Francisca Ariane
----
-
-## 📌 Objetivo
-
-Implementar um sistema distribuído capaz de:
-
-- Gerenciar produtos veterinários (vacinas, medicamentos, etc.)
-- Realizar comunicação cliente-servidor via sockets (TCP)
-- Enviar notificações em tempo real via multicast (UDP)
-- Serializar e desserializar objetos (POJO)
-- Manipular streams personalizados (InputStream/OutputStream)
+O **servidor** é implementado em **C++** e o **cliente** em **Java**.
+Ambos se comunicam via **TCP na porta 8080** trocando mensagens **JSON**.
 
 ---
 
-## 🧱 Estrutura do Projeto
+## Estrutura
 
 ```
-
-vet/
-├── cliente/
-│   ├── clienteClinicaCompleto.cpp   # cliente principal (TCP + UDP multicast)
-│   ├── protocolo/
-│   │   └── Protocolo.cpp           # empacotamento/desempacotamento
-│   ├── src/
-│   │   ├── Produto.cpp
-│   │   ├── VacinaPerecivel.cpp
-│   │   ├── ProdutoQuimioterapico.cpp
-│   │   └── ...                     # classes POJO
-│   ├── modelo/
-│   │   ├── ProdutoServico.cpp      # regras de negócio
-│   │   └── EstoqueServico.cpp
-│   ├── stream/
-│   │   ├── VacinaPerecivelOutputStream.cpp
-│   │   └── VacinaPerecivelInputStream.cpp
-│   └── multicast/
-│       └── (receptor de alertas UDP)
-│
-├── src/                            # versão Java do servidor
-│   ├── servidor/
-│   ├── protocolo/
-│   ├── pojo/
-│   └── ...
-│
-├── vacinas.bin                     # arquivo binário de teste
-└── compile_run.sh                 # script auxiliar
-
+rmi-sistema/
+├── servidor-cpp/          ← servidor RMI em C++
+│   ├── include/
+│   │   ├── modelo/        ← headers das entidades
+│   │   ├── rmi/           ← headers do protocolo RMI
+│   │   └── utils/         ← utilitários (JSON, Socket)
+│   └── src/
+│       ├── main.cpp       ← ponto de entrada do servidor
+│       ├── makefile
+│       ├── modelo/        ← implementação das entidades
+│       ├── protocolo/     ← Request e Reply
+│       ├── rmi/           ← Expedidor e RMIServidor
+│       ├── servico/       ← ProdutoServico e EstoqueServico
+│       └── skeleton/      ← ProdutoSkeleton e EstoqueSkeleton
+└── cliente-java/          ← cliente RMI em Java
+    ├── compile_run.sh
+    └── src/
+        ├── entidade/      ← Produto, VacinaPerecivel, Estoque...
+        ├── rmi/           ← RemoteObjectRef, RequestReplyProtocol
+        ├── serializacao/  ← JSON.java
+        ├── servidor/      ← ClinicaRemota, ClinicaImpl, EstoqueImpl, ServidorRMI
+        └── cliente/       ← ClienteRMI
 ```
 
 ---
 
-## 🧩 Tecnologias Utilizadas
+## Como executar
 
-- Java (Servidor)
-- C++ (Cliente)
-- Sockets TCP
-- UDP Multicast
-- Serialização manual (protocolo próprio)
-
----
-
-## 🔄 Comunicação do Sistema
-
-### 🔵 TCP (cliente-servidor)
-Usado para:
-- Listar produtos
-- Buscar por espécie
-- Cadastrar produtos
-- Gerar relatórios
-
-### 🟣 UDP Multicast
-Usado para:
-- Alertas (recall, promoção, vencimento)
-- Notificações em tempo real para todos os clientes
-
----
-
-## 📦 Protocolo de Comunicação
-
-Formato da mensagem:
-
-```
-
-[1 byte]   operação
-[4 bytes]  tamanho do payload
-[N bytes]  payload (dados)
-
-````
-
----
-
-## 🧪 Funcionalidades Implementadas
-
-- Cadastro de produtos
-- Listagem e busca
-- Verificação de produtos vencidos
-- Envio de alertas multicast
-- Janela de operação para pedidos
-- Relatório de estoque
-
----
-
-## 🧬 POJOs
-
-Exemplos:
-- VacinaPerecivel
-- ProdutoQuimioterapico
-
----
-
-## 🔁 Streams Customizados
-
-### OutputStream
-- Envia arrays de objetos POJO
-- Testado com:
-  - System.out
-  - Arquivo
-  - Socket TCP
-
-### InputStream
-- Lê dados serializados
-- Reconstrói objetos
-
----
-
-## ▶️ Como Executar
-
-### 1. Compilar cliente (C++)
-```bash
-g++ cliente/clienteClinicaCompleto.cpp modelo/*.cpp stream/*.cpp src/*.cpp protocolo/*.cpp -Iinclude -o clienteClinicaCompleto
-````
-
-### 2. Executar cliente
+### Terminal 1 — Servidor C++
 
 ```bash
-./clienteClinicaCompleto
+cd rmi-sistema/servidor-cpp/src
+make
+./rmi_servidor
 ```
 
-### 3. Executar servidor (Java)
+O servidor ficará escutando na porta **8080**.
+
+### Terminal 2 — Cliente Java
 
 ```bash
-javac -d out src/**/*.java
-java -cp out servidor.ServidorClinicaCompleto
+cd rmi-sistema/cliente-java
+bash compile_run.sh cliente
 ```
 
 ---
 
-## 🌐 Execução em Rede
+## Formato das mensagens (JSON)
 
-Para rodar em máquinas diferentes:
+### Request (cliente → servidor)
 
-* Alterar o IP do servidor no cliente C++
-
-```cpp
-inet_pton(AF_INET, "10.10.239.205", &server.sin_addr);
+```json
+{
+    "TipoMensagem": "Request",
+    "requestId": 1,
+    "referenciaObj": { "objetoId": 1, "NomeObjeto": "ProdutoService" },
+    "metodoId": "buscarPorId",
+    "parametros": { "id": 1 }
+}
 ```
 
-* Garantir que ambas máquinas estejam na mesma rede
+### Reply (servidor → cliente)
+
+```json
+{
+    "requestId": 1,
+    "status": "OK",
+    "resultado": { ... }
+}
+```
 
 ---
 
-## ⚠️ Dificuldades Encontradas
+## Serviços disponíveis
 
-* Configuração de rede (IP e conexão TCP)
-* Problemas com multicast (dependência da rede)
-* Integração entre Java e C++
-* Implementação do protocolo binário
-* Uso de threads para comunicação simultânea
+### ProdutoService
 
----
+| Método | Parâmetros | Retorno |
+|---|---|---|
+| `buscarPorId` | `{"id": N}` | objeto Produto |
+| `listarTodos` | `{}` | lista de Produtos |
+| `buscarPorEspecie` | `{"especie": "Canino"}` | lista de Produtos |
+| `calcularValorTotal` | `{}` | número |
+| `remover` | `{"id": N}` | status |
+| `listarVencidos` | `{}` | lista de VacinaPerecivel |
 
-## 💡 Conclusão
+### EstoqueService
 
-### ENTREGA 1:
-
-* Comunicação via sockets
-* Serialização de dados
-* Concorrência
-* Multicast
-
-
+| Método | Parâmetros | Retorno |
+|---|---|---|
+| `criarEstoque` | `{"local": "nome"}` | objeto Estoque |
+| `listarEstoques` | `{}` | lista de Estoques |
+| `entradaProduto` | `{"estoqueId": N, "produtoId": N}` | status |
+| `saidaProduto` | `{"estoqueId": N, "produtoId": N}` | status |
+| `alertarVencidos` | `{}` | lista de vencidos |
