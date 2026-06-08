@@ -1,0 +1,11 @@
+entidade/Estoque.class
+recurso/ProdutoRecurso.class
+entidade/VacinaPerecivel.class
+servico/RelatorioServico.class
+servico/EstoqueServico.class
+ServidorApp.class
+entidade/ProdutoVeterinario.class
+recurso/EstoqueRecurso.class
+recurso/RelatorioRecurso.class
+entidade/Produto.class
+servico/ProdutoServico.class

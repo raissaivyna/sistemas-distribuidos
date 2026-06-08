@@ -10,7 +10,7 @@ import java.util.List;
 /*1--- int id = produtoService.buscarPorID(1); */
 public class ClienteRMI {
 
-    static final String HOST  = "localhost";
+    static final String HOST  = "10.10.236.250";
     static final int    PORTA = 8080;
 
     static RequestReplyProtocol protocolo = new RequestReplyProtocol();
