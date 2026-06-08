@@ -26,7 +26,14 @@ case "$1" in
   cpp)
     echo "Compilando cliente C++..."
     cd cliente-cpp
-    g++ -o cliente_cpp cliente_cpp.cpp -lcurl
+
+    g++ \
+        main.cpp \
+        ClienteAPI.cpp \
+        -std=c++17 \
+        -lcurl \
+        -o cliente_cpp
+
     echo "Executando cliente C++..."
     ./cliente_cpp
     ;;
